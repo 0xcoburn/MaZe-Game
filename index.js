@@ -52,7 +52,7 @@ const shuffle = (arr) => {
 
 const grid = Array(cells).fill(null).map(() => Array(cells).fill(false));
 
-const verticles = Array(cells).fill(null).map(() => Array(cells - 1).fill(false));
+const verticals = Array(cells).fill(null).map(() => Array(cells - 1).fill(false));
 const horizontals = Array(cells - 1).fill(null).map(() => Array(cells).fill(false));
 
 const startRow = Math.floor(Math.random() * cells);
@@ -63,19 +63,45 @@ stepThruCell = (row, col) => {
 	if (grid[row][col] === true) {
 		return;
 	}
+
 	//Mark this cell as being visited
 	grid[row][col] = true;
+
 	//Assemble randomly-ordered list of neighbors
-	const neighbors = shuffle([ [ row - 1, col ], [ row + 1, col ], [ row, col - 1 ], [ row, col + 1 ] ]);
-	console.log(neighbors);
+	const neighbors = shuffle([
+		[ row - 1, col, 'up' ],
+		[ row + 1, col, 'down' ],
+		[ row, col - 1, 'left' ],
+		[ row, col + 1, 'right' ]
+	]);
+
 	//For each neighbor...
+	for (let neighbor of neighbors) {
+		const [ nextRow, nextCol, direction ] = neighbor;
 
-	//see if that neighbor is out of bounds
+		//see if that neighbor is out of bounds
+		if (nextRow < 0 || nextRow >= cells || nextCol < 0 || nextCol >= cells) {
+			continue;
+		}
 
-	//if we have visited that neighbor continue to next neighbor
+		//if we have visited that neighbor continue to next neighbor
+		if (grid[nextRow][nextCol]) {
+			continue;
+		}
 
-	//remove wall from either horizontal or verticle array
+		//remove wall from either horizontal or verticle array
+		if (direction === 'left') {
+			verticals[row][col - 1] = true;
+		} else if (direction === 'right') {
+			verticals[row][col] = true;
+		} else if (direction === 'up') {
+			horizontals[row - 1][col] = true;
+		} else if (direction === 'down') {
+			horizontals[row][col] = true;
+		}
 
-	// visit next cell
+		// visit next cell
+		stepThruCell(nextRow, nextCol);
+	}
 };
-stepThruCell(1, 1);
+stepThruCell(startRow, startCol);
