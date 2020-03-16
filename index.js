@@ -1,8 +1,11 @@
 const { Engine, Render, Runner, World, Bodies } = Matter;
 
-const cells = 3;
-const width = 600;
-const height = 600;
+//MaZe Demensions
+const cells = 8;
+const width = 1200;
+const height = 1200;
+
+const unitLength = width / cells;
 
 const engine = Engine.create();
 const { world } = engine;
@@ -37,7 +40,6 @@ const walls = [
 World.add(world, walls);
 
 // MaZe Generation
-
 const shuffle = (arr) => {
 	let counter = arr.length;
 	while (counter > 0) {
@@ -100,8 +102,48 @@ stepThruCell = (row, col) => {
 			horizontals[row][col] = true;
 		}
 
-		// visit next cell
+		//visit next cell
 		stepThruCell(nextRow, nextCol);
 	}
 };
 stepThruCell(startRow, startCol);
+
+//horizontal walls
+horizontals.forEach((row, rowIndex) => {
+	row.forEach((open, columnIndex) => {
+		if (open) {
+			return;
+		}
+
+		const wall = Bodies.rectangle(
+			columnIndex * unitLength + unitLength / 2,
+			rowIndex * unitLength + unitLength,
+			unitLength,
+			2,
+			{
+				isStatic: true
+			}
+		);
+		World.add(world, wall);
+	});
+});
+
+//vertical walls
+verticals.forEach((row, rowIndex) => {
+	row.forEach((open, columnIndex) => {
+		if (open) {
+			return;
+		}
+
+		const wall = Bodies.rectangle(
+			columnIndex * unitLength + unitLength,
+			rowIndex * unitLength + unitLength / 2,
+			2,
+			unitLength,
+			{
+				isStatic: true
+			}
+		);
+		World.add(world, wall);
+	});
+});
